@@ -4,7 +4,7 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "authors")
-data class Author(
+data class AuthorEntity(
     @Id
     @Column(name = "id")
     @GeneratedValue(

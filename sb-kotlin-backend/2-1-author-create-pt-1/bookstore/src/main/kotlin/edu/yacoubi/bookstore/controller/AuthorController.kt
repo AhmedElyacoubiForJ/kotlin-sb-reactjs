@@ -1,6 +1,6 @@
 package edu.yacoubi.bookstore.controller
 
-import edu.yacoubi.bookstore.domain.entities.Author
+import edu.yacoubi.bookstore.domain.dto.AuthorDto
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 class AuthorController {
 
     @PostMapping(path = ["/v1/authors"])
-    fun createAuthor(@RequestBody author: Author) {
+    fun createAuthor(@RequestBody authorDto: AuthorDto) {
         // Implement author creation logic here
     }
 }
