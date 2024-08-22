@@ -13,6 +13,8 @@ class AuthorController(private val authorService: IAuthorService) {
 
     @PostMapping(path = ["/v1/authors"])
     fun createAuthor(@RequestBody authorDto: AuthorDto): AuthorDto {
-        return authorService.save(authorDto.toAuthorEntity()).toAuthorDto()
+        return authorService.save(
+            authorDto.toAuthorEntity()
+        ).toAuthorDto()
     }
 }
