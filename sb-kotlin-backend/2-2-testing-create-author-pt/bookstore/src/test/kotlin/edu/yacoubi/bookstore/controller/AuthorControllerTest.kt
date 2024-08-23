@@ -5,6 +5,7 @@ import com.ninjasquad.springmockk.MockkBean
 import edu.yacoubi.bookstore.domain.dto.AuthorDto
 import edu.yacoubi.bookstore.domain.entities.AuthorEntity
 import edu.yacoubi.bookstore.service.IAuthorService
+import edu.yacoubi.bookstore.testAuthorDtoA
 import io.mockk.every
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
@@ -35,15 +36,7 @@ class AuthorControllerTest @Autowired constructor(
         mockMvc.post("/v1/authors") {
             contentType = MediaType.APPLICATION_JSON
             accept = MediaType.APPLICATION_JSON
-            content = objectMapper.writeValueAsString(
-                AuthorDto(
-                    id = null,
-                    name = "John Doe",
-                    age = 42,
-                    description = "Author of the best books ever written.",
-                    image = "https://example.com/author-image.jpg"
-                )
-            )
+            content = objectMapper.writeValueAsString(testAuthorDtoA())
         }.andExpect {
             status { isCreated() }
         }
@@ -52,27 +45,19 @@ class AuthorControllerTest @Autowired constructor(
     @Test
     fun `test create Author saves the Author`() {
         // Given
-        val authorDto = AuthorDto(
-            id = null,
-            name = "John Doe",
-            age = 42,
-            description = "Author of the best books ever written.",
-            image = "https://example.com/author-image.jpg"
-        )
-
         // When
         mockMvc.post("/v1/authors") {
             contentType = MediaType.APPLICATION_JSON
             accept = MediaType.APPLICATION_JSON
-            content = objectMapper.writeValueAsString(authorDto)
+            content = objectMapper.writeValueAsString(testAuthorDtoA())
         }
 
         val expected = AuthorEntity(
             id = null,
             name = "John Doe",
-            age = 42,
-            description = "Author of the best books ever written.",
-            image = "https://example.com/author-image.jpg"
+            age = 30,
+            description = "Author A description",
+            image = "author-a-image.jpeg"
         )
 
         // Then
