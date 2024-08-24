@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import authorService from '../services/authorService';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const AuthorForm = () => {
   const [author, setAuthor] = useState({
@@ -27,45 +28,53 @@ const AuthorForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Name:</label>
+    <form onSubmit={handleSubmit} className="container">
+      <div className="form-group">
+        <label htmlFor="name">Name:</label>
         <input
           type="text"
+          className="form-control"
+          id="name"
           name="name"
           value={author.name}
           onChange={handleInputChange}
         />
       </div>
-      <div>
-        <label>Age:</label>
+      <div className="form-group">
+        <label htmlFor="age">Age:</label>
         <input
           type="number"
+          className="form-control"
+          id="age"
           name="age"
           value={author.age}
           onChange={handleInputChange}
         />
       </div>
-      <div>
-        <label>Description:</label>
+      <div className="form-group">
+        <label htmlFor="description">Description:</label>
         <input
           type="text"
+          className="form-control"
+          id="description"
           name="description"
           value={author.description}
           onChange={handleInputChange}
         />
       </div>
-      <div>
-        <label>Image:</label>
+      <div className="form-group">
+        <label htmlFor="image">Image:</label>
         <input
           type="text"
+          className="form-control"
+          id="image"
           name="image"
           value={author.image}
           onChange={handleInputChange}
         />
       </div>
       {/* Add other form fields as needed */}
-      <button type="submit">Create Author</button>
+      <button type="submit" className="btn btn-primary">Create Author</button>
     </form>
   );
 };
