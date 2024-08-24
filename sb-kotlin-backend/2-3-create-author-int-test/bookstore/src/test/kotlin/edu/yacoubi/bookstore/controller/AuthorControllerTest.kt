@@ -36,7 +36,9 @@ class AuthorControllerTest @Autowired constructor(
         mockMvc.post("/v1/authors") {
             contentType = MediaType.APPLICATION_JSON
             accept = MediaType.APPLICATION_JSON
-            content = objectMapper.writeValueAsString(testAuthorDtoA())
+            content = objectMapper.writeValueAsString(
+                testAuthorDtoA()
+            )
         }.andExpect {
             status { isCreated() }
         }
@@ -49,7 +51,9 @@ class AuthorControllerTest @Autowired constructor(
         mockMvc.post("/v1/authors") {
             contentType = MediaType.APPLICATION_JSON
             accept = MediaType.APPLICATION_JSON
-            content = objectMapper.writeValueAsString(testAuthorDtoA())
+            content = objectMapper.writeValueAsString(
+                testAuthorDtoA()
+            )
         }
 
         val expected = AuthorEntity(
