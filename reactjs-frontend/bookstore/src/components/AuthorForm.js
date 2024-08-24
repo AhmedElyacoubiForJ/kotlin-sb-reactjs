@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const AuthorForm = () => {
   const [author, setAuthor] = useState({
     name: '',
-    age: 0,
+    age: null,
     description: '',
     image: ''
   });
