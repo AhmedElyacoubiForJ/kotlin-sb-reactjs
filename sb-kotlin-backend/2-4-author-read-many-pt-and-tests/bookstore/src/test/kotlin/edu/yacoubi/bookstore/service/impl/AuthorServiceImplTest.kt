@@ -1,5 +1,6 @@
 package edu.yacoubi.bookstore.service.impl
 
+import edu.yacoubi.bookstore.domain.entities.AuthorEntity
 import edu.yacoubi.bookstore.repository.AuthorRepository
 import edu.yacoubi.bookstore.testAuthorEntityA
 import edu.yacoubi.bookstore.testAuthorEntityB
@@ -30,16 +31,20 @@ class AuthorServiceImplTest @Autowired constructor(
 
     @Test
     fun `test that list authors should returns empty list when no authors in the database`() {
-        val result = underTest.list();
+        val result = underTest.list()
+        // assertThat(result).isNotEmpty() failing test
         assertThat(result).isEmpty()
     }
 
     @Test
     fun `test that list authors should return all authors from the database`() {
-        authorRepository.saveAll(listOf(testAuthorEntityA(1), testAuthorEntityB(2)))
+        val savedAuthorA = underTest.save(testAuthorEntityA())
+        val savedAuthorB = underTest.save(testAuthorEntityB())
+        val expected = listOf(savedAuthorA, savedAuthorB)
 
         val result = underTest.list();
         assertThat(result).hasSize(2)
-        assertThat(result).contains(testAuthorEntityA(1), testAuthorEntityB(2))
+        assertThat(result).isEqualTo(expected)
+        //assertThat(result).contains(testAuthorEntityA(1), testAuthorEntityB(2))
     }
 }
