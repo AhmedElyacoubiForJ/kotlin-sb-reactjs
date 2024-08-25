@@ -123,7 +123,8 @@ class AuthorControllerTest @Autowired constructor(
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { isOk() }
-            content { objectMapper.writeValueAsString(authors)
+            content {
+                objectMapper.writeValueAsString(authors)
 //                json(
 //                    """
 //                    [
@@ -147,29 +148,70 @@ class AuthorControllerTest @Autowired constructor(
                 jsonPath("$.length()").value(2)
 
                 jsonPath("$.[0].id").value(1)
-                jsonPath("$.[0].id" , equalTo(1)) // or w. hamcrest Matchers
+                jsonPath("$.[0].id", equalTo(1)) // or w. hamcrest Matchers
                 jsonPath("$.[0].name").value("John Doe")
-                jsonPath("$.[0].name" , equalTo("John Doe")) // or w. hamcrest Matchers
+                jsonPath("$.[0].name", equalTo("John Doe")) // or w. hamcrest Matchers
                 jsonPath("$.[0].age").value(30)
-                jsonPath("$.[0].age" , equalTo(30)) // or w. hamcrest Matchers
+                jsonPath("$.[0].age", equalTo(30)) // or w. hamcrest Matchers
                 jsonPath("$.[0].description").value("Author A description")
                 jsonPath("$.[0].description", equalTo("Author A description"))  //or w. hamcrest Matchers
                 jsonPath("$.[0].image").value("author-a-image.jpeg")
                 jsonPath("$.[0].image", equalTo("author-a-image.jpeg"))  // or w. hamcrest Matchers
 
                 jsonPath("$.[1].id").value(2)
-                jsonPath("$.[1].id" , equalTo(2)) // or w. hamcrest Matchers
+                jsonPath("$.[1].id", equalTo(2)) // or w. hamcrest Matchers
                 jsonPath("$.[1].name").value("Paul Franklin")
-                jsonPath("$.[1].name" , equalTo("Paul Franklin")) // or w. hamcrest Matchers
+                jsonPath("$.[1].name", equalTo("Paul Franklin")) // or w. hamcrest Matchers
                 jsonPath("$.[1].age").value(35)
-                jsonPath("$.[1].age" , equalTo(35)) // or w. hamcrest Matchers
+                jsonPath("$.[1].age", equalTo(35)) // or w. hamcrest Matchers
                 jsonPath("$.[1].description").value("Author B description")
                 jsonPath("$.[1].description", equalTo("Author B description"))  // or w. hamcrest Matchers
                 jsonPath("$.[1].image").value("author-b-image.jpeg")
                 jsonPath("$.[1].image", equalTo("author-b-image.jpeg"))  // or w. hamcrest Matchers
-
             }
         }
+    }
 
+    @Test
+    fun `test that get Author by id returns HTTP status 404 when author not found in the database`() {
+        // Given mock with exceptions
+        every { authorService.getAuthor(any()) } answers { null }
+        //every { authorService.getAuthor(1) } returns null
+
+        // When & Then
+        mockMvc.get("$AUTHORS_BASE_URL/{id}", -1) { // or "${AUTHOR_BASE_URL}/-1"
+            contentType = MediaType.APPLICATION_JSON
+            accept = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { isNotFound() } // isOk() failing test
+        }
+    }
+
+    @Test
+    fun `test that get Author by id returns the Author and HTTP status 200`() {
+        // Given
+        val author = testAuthorEntityA(1)
+        every { authorService.getAuthor(any()) } answers { author }
+
+        // When & Then
+        mockMvc.get("$AUTHORS_BASE_URL/{id}", 1) { // or "${AUTHOR_BASE_URL}/1"
+            contentType = MediaType.APPLICATION_JSON
+            accept = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { isOk() }
+            content {
+                objectMapper.writeValueAsString(author)
+                //jsonPath("$.id").value(1)
+                jsonPath("$.id", equalTo(1)) // or w. hamcrest Matchers
+                //jsonPath("$.name").value("John Doe")
+                jsonPath("$.name", equalTo("John Doe")) // or w. hamcrest Matchers
+                //jsonPath("$.age").value(30)
+                jsonPath("$.age", equalTo(30)) // or w. hamcrest Matchers
+                //jsonPath("$.description").value("Author A description")
+                jsonPath("$.description", equalTo("Author A description"))  // or w. hamcrest Matchers
+                //jsonPath("$.image").value("author-a-image.jpeg")
+                jsonPath("$.image", equalTo("author-a-image.jpeg"))  // or w. hamcrest Matchers
+            }
+        }
     }
 }
