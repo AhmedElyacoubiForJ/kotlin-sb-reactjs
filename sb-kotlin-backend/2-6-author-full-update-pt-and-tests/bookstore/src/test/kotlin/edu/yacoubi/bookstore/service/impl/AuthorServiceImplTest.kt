@@ -1,5 +1,6 @@
 package edu.yacoubi.bookstore.service.impl
 
+import edu.yacoubi.bookstore.domain.entities.AuthorEntity
 import edu.yacoubi.bookstore.repository.AuthorRepository
 import edu.yacoubi.bookstore.testAuthorEntityA
 import edu.yacoubi.bookstore.testAuthorEntityB
@@ -70,5 +71,39 @@ class AuthorServiceImplTest @Autowired constructor(
 
         // then
         assertThat(result).isEqualTo(savedAuthor)
+    }
+
+    @Test
+    fun `test that full update author should update the author in the database`() {
+        // Given
+        val existingAuthor = authorRepository.save(testAuthorEntityA())
+        val existingAuthorId = existingAuthor.id!!
+        val updatedAuthor = AuthorEntity(
+            id = existingAuthorId,
+            name = "Updated name",
+            age = 99,
+            description = "This is an updated description",
+            image = "updated-image.jpg"
+        )
+
+        // When
+        var result = underTest.fullUpdate(existingAuthorId, updatedAuthor)
+        val retrievedAuthor = authorRepository.findByIdOrNull(existingAuthorId)
+
+        // Then
+        assertThat(result).isEqualTo(updatedAuthor)
+        assertThat(retrievedAuthor).isNotNull()
+    }
+
+    @Test
+    fun `test that full update author should throws an IllegalStateException when author doesn't exist in the database`() {
+        // Given
+        val nonExistingAuthorId = -1L
+        val updatedAuthor = testAuthorEntityB(id = nonExistingAuthorId)
+
+        // When & Then
+        assertThrows<IllegalStateException> {
+            underTest.fullUpdate(nonExistingAuthorId, updatedAuthor)
+        }
     }
 }
