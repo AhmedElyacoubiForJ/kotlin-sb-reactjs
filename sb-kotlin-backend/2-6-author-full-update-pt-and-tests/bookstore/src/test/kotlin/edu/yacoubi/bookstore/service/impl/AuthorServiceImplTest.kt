@@ -5,6 +5,7 @@ import edu.yacoubi.bookstore.testAuthorEntityA
 import edu.yacoubi.bookstore.testAuthorEntityB
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
@@ -19,13 +20,20 @@ class AuthorServiceImplTest @Autowired constructor(
     private val authorRepository: AuthorRepository) {
 
     @Test
-    fun `test that save author should persist the author in the database`() {
+    fun `test that create author should persist the author in the database`() {
         val savedAuthor = underTest.create(testAuthorEntityA())
         assertThat(savedAuthor.id).isNotNull()
 
         val retrievedAuthor = authorRepository.findByIdOrNull(savedAuthor.id!!)
         assertThat(retrievedAuthor).isNotNull()
         assertThat(retrievedAuthor).isEqualTo(testAuthorEntityA(savedAuthor.id))
+    }
+
+    @Test
+    fun `test that create author with an ID should throws an IllegalArgumentException`() {
+        assertThrows<IllegalArgumentException> {
+            underTest.create(testAuthorEntityA(999))
+        }
     }
 
     @Test

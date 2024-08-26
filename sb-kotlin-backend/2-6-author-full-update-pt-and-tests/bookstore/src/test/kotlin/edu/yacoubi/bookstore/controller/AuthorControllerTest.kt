@@ -55,6 +55,21 @@ class AuthorControllerTest @Autowired constructor(
     }
 
     @Test
+    fun `test that create Author returns HTTP status 400 when IllegalArgumentException is thrown`() {
+        // Given mock with exceptions
+        every { authorService.create(any()) } throws(IllegalArgumentException())
+
+        // When & Then
+        mockMvc.post(AUTHORS_BASE_URL) {
+            contentType = MediaType.APPLICATION_JSON
+            accept = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(
+                testAuthorDtoA()
+            )
+        }.andExpect { status { isBadRequest() } }
+    }
+
+    @Test
     fun `test create Author saves the Author`() {
         // Given
         // When
@@ -214,4 +229,7 @@ class AuthorControllerTest @Autowired constructor(
             }
         }
     }
+
+    @Test
+    fun `test that full update Author returns HTTP status 400 when author not found in the database`() {}
 }
