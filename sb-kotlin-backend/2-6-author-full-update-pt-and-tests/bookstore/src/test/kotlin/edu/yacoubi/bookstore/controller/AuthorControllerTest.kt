@@ -19,6 +19,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 
 private const val AUTHORS_BASE_URL = "/v1/authors"
@@ -57,7 +58,7 @@ class AuthorControllerTest @Autowired constructor(
     @Test
     fun `test that create Author returns HTTP status 400 when IllegalArgumentException is thrown`() {
         // Given mock with exceptions
-        every { authorService.create(any()) } throws(IllegalArgumentException())
+        every { authorService.create(any()) } throws (IllegalArgumentException())
 
         // When & Then
         mockMvc.post(AUTHORS_BASE_URL) {
@@ -231,5 +232,30 @@ class AuthorControllerTest @Autowired constructor(
     }
 
     @Test
-    fun `test that full update Author returns HTTP status 400 when author not found in the database`() {}
+    fun `test that full update Author returns HTTP status 200 when updated author successfully saved`() {
+        // Given
+        val testAuthorEntityA = testAuthorEntityA(-1)
+        val expected = testAuthorEntityA.copy(id = 99)
+        every { authorService.fullUpdate(any(), any()) } answers { expected }
+
+        // When
+        val result = mockMvc.put("$AUTHORS_BASE_URL/{id}", 99) {
+            contentType = MediaType.APPLICATION_JSON
+            accept = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(testAuthorEntityA)
+        }
+
+        // Then
+        result.andExpect {
+            status { isOk() }
+            content {
+                jsonPath("$.id", expected.id)
+                jsonPath("$.name", equalTo(expected.name))
+                jsonPath("$.age", equalTo(expected.age))
+                jsonPath("$.description", equalTo(expected.description))
+                jsonPath("$.image", equalTo(expected.image))
+            }
+        }
+        verify { authorService.fullUpdate(eq(99), eq(testAuthorEntityA)) }
+    }
 }
