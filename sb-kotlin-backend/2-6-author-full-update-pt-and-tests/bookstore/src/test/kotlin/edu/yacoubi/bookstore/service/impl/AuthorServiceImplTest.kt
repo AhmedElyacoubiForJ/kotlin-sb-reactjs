@@ -1,6 +1,5 @@
 package edu.yacoubi.bookstore.service.impl
 
-import edu.yacoubi.bookstore.domain.entities.AuthorEntity
 import edu.yacoubi.bookstore.repository.AuthorRepository
 import edu.yacoubi.bookstore.testAuthorEntityA
 import edu.yacoubi.bookstore.testAuthorEntityB
@@ -21,7 +20,7 @@ class AuthorServiceImplTest @Autowired constructor(
 
     @Test
     fun `test that save author should persist the author in the database`() {
-        val savedAuthor = underTest.save(testAuthorEntityA())
+        val savedAuthor = underTest.create(testAuthorEntityA())
         assertThat(savedAuthor.id).isNotNull()
 
         val retrievedAuthor = authorRepository.findByIdOrNull(savedAuthor.id!!)
@@ -38,14 +37,13 @@ class AuthorServiceImplTest @Autowired constructor(
 
     @Test
     fun `test that list authors should return all authors from the database`() {
-        val savedAuthorA = underTest.save(testAuthorEntityA())
-        val savedAuthorB = underTest.save(testAuthorEntityB())
+        val savedAuthorA = underTest.create(testAuthorEntityA())
+        val savedAuthorB = underTest.create(testAuthorEntityB())
         val expected = listOf(savedAuthorA, savedAuthorB)
 
         val result = underTest.list();
         assertThat(result).hasSize(2)
         assertThat(result).isEqualTo(expected)
-        //assertThat(result).contains(testAuthorEntityA(1), testAuthorEntityB(2))
     }
 
     @Test

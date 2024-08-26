@@ -35,7 +35,7 @@ class AuthorControllerTest @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         every {
-            authorService.save(any())
+            authorService.create(any())
         } answers {
             firstArg()
         }
@@ -75,7 +75,7 @@ class AuthorControllerTest @Autowired constructor(
         )
 
         // Then
-        verify { authorService.save(eq(expected)) }
+        verify { authorService.create(eq(expected)) }
     }
 
     @Test
