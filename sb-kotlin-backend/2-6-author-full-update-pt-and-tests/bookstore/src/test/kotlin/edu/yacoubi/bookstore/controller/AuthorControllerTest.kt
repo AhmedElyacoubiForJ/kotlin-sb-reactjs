@@ -262,7 +262,7 @@ class AuthorControllerTest @Autowired constructor(
         verify { authorService.fullUpdate(eq(99), eq(testAuthorEntityA)) }
     }
 
-    @Test // please in Given, When and Then pattern
+    @Test
     fun `test that full update Author returns HTTP status 400 an IllegalStateException`() {
         // Given
         val testAuthorEntityA = testAuthorEntityA(-1)
