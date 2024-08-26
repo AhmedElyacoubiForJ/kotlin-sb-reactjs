@@ -44,6 +44,9 @@ class AuthorControllerTest @Autowired constructor(
 
     @Test
     fun `test that create Author returns a HTTP 201 as status`() {
+        // Given
+        // When
+        // Then
         mockMvc.post(AUTHORS_BASE_URL) {
             contentType = MediaType.APPLICATION_JSON
             accept = MediaType.APPLICATION_JSON
@@ -255,6 +258,27 @@ class AuthorControllerTest @Autowired constructor(
                 jsonPath("$.description", equalTo(expected.description))
                 jsonPath("$.image", equalTo(expected.image))
             }
+        }
+        verify { authorService.fullUpdate(eq(99), eq(testAuthorEntityA)) }
+    }
+
+    @Test // please in Given, When and Then pattern
+    fun `test that full update Author returns HTTP status 400 an IllegalStateException`() {
+        // Given
+        val testAuthorEntityA = testAuthorEntityA(-1)
+        every { authorService.fullUpdate(any(), any()) } throws IllegalStateException("Test exception")
+
+        // When
+        val result = mockMvc.put("$AUTHORS_BASE_URL/{id}", 99) {
+            contentType = MediaType.APPLICATION_JSON
+            accept = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(testAuthorEntityA)
+        }
+
+        // Then
+        result.andExpect {
+            status { isBadRequest() }
+            content { jsonPath("$.error").value("Test exception") }
         }
         verify { authorService.fullUpdate(eq(99), eq(testAuthorEntityA)) }
     }
