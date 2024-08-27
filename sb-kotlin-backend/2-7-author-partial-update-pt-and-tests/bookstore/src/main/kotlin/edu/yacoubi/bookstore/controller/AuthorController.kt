@@ -1,9 +1,11 @@
 package edu.yacoubi.bookstore.controller
 
 import edu.yacoubi.bookstore.domain.dto.AuthorDto
+import edu.yacoubi.bookstore.domain.dto.AuthorUpdateRequestDto
 import edu.yacoubi.bookstore.service.IAuthorService
 import edu.yacoubi.bookstore.toAuthorDto
 import edu.yacoubi.bookstore.toAuthorEntity
+import edu.yacoubi.bookstore.toAuthorUpdateRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -52,6 +54,22 @@ class AuthorController(private val authorService: IAuthorService) {
 
         return try {
             val updatedAuthor = authorService.fullUpdate(id, authorDto.toAuthorEntity())
+            ResponseEntity(updatedAuthor.toAuthorDto(), HttpStatus.OK)
+        } catch (ex: IllegalStateException) {
+            ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+    }
+
+    @PatchMapping(path = ["/{id}"])
+    fun partialUpdateAuthor(
+        @PathVariable id: Long,
+        @RequestBody authorUpdateRequestDto: AuthorUpdateRequestDto
+    ): ResponseEntity<AuthorDto> {
+        return try {
+            val updatedAuthor = authorService.partialUpdate(
+                id,
+                authorUpdateRequestDto.toAuthorUpdateRequest()
+            )
             ResponseEntity(updatedAuthor.toAuthorDto(), HttpStatus.OK)
         } catch (ex: IllegalStateException) {
             ResponseEntity(HttpStatus.BAD_REQUEST)
