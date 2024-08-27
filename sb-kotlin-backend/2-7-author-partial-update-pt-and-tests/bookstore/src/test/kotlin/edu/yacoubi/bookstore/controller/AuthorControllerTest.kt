@@ -2,11 +2,13 @@ package edu.yacoubi.bookstore.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
+import edu.yacoubi.bookstore.domain.dto.AuthorUpdateRequestDto
 import edu.yacoubi.bookstore.domain.entities.AuthorEntity
 import edu.yacoubi.bookstore.service.IAuthorService
 import edu.yacoubi.bookstore.testAuthorDtoA
 import edu.yacoubi.bookstore.testAuthorEntityA
 import edu.yacoubi.bookstore.testAuthorEntityB
+import edu.yacoubi.bookstore.testAuthorUpdateRequestDtoA
 import io.mockk.every
 import io.mockk.verify
 import org.hamcrest.Matchers.equalTo
@@ -16,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.post
-import org.springframework.test.web.servlet.put
+import org.springframework.test.web.servlet.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 
 private const val AUTHORS_BASE_URL = "/v1/authors"
@@ -281,5 +280,51 @@ class AuthorControllerTest @Autowired constructor(
             content { jsonPath("$.error").value("Test exception") }
         }
         verify { authorService.fullUpdate(eq(99), eq(testAuthorEntityA)) }
+    }
+
+    @Test
+    fun `test that partial update Author returns HTTP status 400 on IllegalStateException`() {
+        // Given
+        every { authorService.partialUpdate(any(), any()) } throws IllegalStateException("Test exception")
+
+        // When
+        val result = mockMvc.patch("$AUTHORS_BASE_URL/{id}", 99) {
+            contentType = MediaType.APPLICATION_JSON
+            accept = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(testAuthorUpdateRequestDtoA(99))
+        }
+
+        // Then
+        result.andExpect {
+            status { isBadRequest() }
+            content { jsonPath("$.error").value("Test exception") }
+        }
+    }
+
+    @Test
+    fun `test that partial update Author returns HTTP status 200 and updated author`() {
+        // Given
+        val testAuthorUpdateRequestDtoA = testAuthorUpdateRequestDtoA(99)
+        val expected = testAuthorEntityA(99).copy(name = "Updated Name", age = 31)
+        every { authorService.partialUpdate(any(), any()) } answers { expected }
+
+        // When
+        val result = mockMvc.patch("$AUTHORS_BASE_URL/{id}", 99) {
+            contentType = MediaType.APPLICATION_JSON
+            accept = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(testAuthorUpdateRequestDtoA)
+        }
+
+        // Then
+        result.andExpect {
+            status { isOk() }
+            content {
+                jsonPath("$.id", 99)
+                jsonPath("$.name", "Updated Name")
+                jsonPath("$.age", equalTo(expected.age))
+                jsonPath("$.description", expected.description)
+                jsonPath("$.image", expected.image)
+            }
+        }
     }
 }
