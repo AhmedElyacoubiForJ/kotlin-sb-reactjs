@@ -1,5 +1,6 @@
 package edu.yacoubi.bookstore
 
+import edu.yacoubi.bookstore.domain.AuthorUpdateRequest
 import edu.yacoubi.bookstore.domain.dto.AuthorDto
 import edu.yacoubi.bookstore.domain.dto.AuthorUpdateRequestDto
 import edu.yacoubi.bookstore.domain.entities.AuthorEntity
@@ -29,6 +30,14 @@ fun testAuthorEntityB(id: Long? = null) = AuthorEntity(
 )
 
 fun testAuthorUpdateRequestDtoA(id: Long? = null) = AuthorUpdateRequestDto(
+    id = id,
+    name = "John Doe",
+    age = 30,
+    description = "Author A description",
+    image = "author-a-image.jpeg"
+)
+
+fun testAuthorUpdateRequestA(id: Long? = null) = AuthorUpdateRequest(
     id = id,
     name = "John Doe",
     age = 30,

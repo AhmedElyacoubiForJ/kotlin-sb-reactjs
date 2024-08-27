@@ -1,9 +1,9 @@
 package edu.yacoubi.bookstore.domain
 
 data class AuthorUpdateRequest(
-    val id: Long?,
-    val name: String?,
-    val age: Int?,
-    val description: String?,
-    val image: String?
+    val id: Long? = null,
+    val name: String? = null,
+    val age: Int? = null,
+    val description: String? = null,
+    val image: String? = null,
 )
