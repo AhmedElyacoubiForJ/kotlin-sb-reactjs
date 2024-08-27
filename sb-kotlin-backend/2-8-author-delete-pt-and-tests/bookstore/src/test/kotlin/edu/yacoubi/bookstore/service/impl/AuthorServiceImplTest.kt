@@ -6,6 +6,7 @@ import edu.yacoubi.bookstore.repository.AuthorRepository
 import edu.yacoubi.bookstore.testAuthorEntityA
 import edu.yacoubi.bookstore.testAuthorEntityB
 import edu.yacoubi.bookstore.testAuthorUpdateRequestA
+import jakarta.transaction.Transactional
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -15,9 +16,10 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.annotation.DirtiesContext
 
 @SpringBootTest
-@DirtiesContext(
-    classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD
-)
+//@DirtiesContext(
+//    classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD
+//)
+@Transactional
 class AuthorServiceImplTest @Autowired constructor(
     private val underTest: AuthorServiceImpl,
     private val authorRepository: AuthorRepository) {
@@ -244,5 +246,34 @@ class AuthorServiceImplTest @Autowired constructor(
         // Then
         assertThat(result).isEqualTo(expected)
         assertThat(retrievedAuthor).isNotNull()
+    }
+
+    @Test
+    fun `test that delete author deletes an non existing author in the database`() {
+        // Given
+        val nonExistingAuthorId = -1L
+
+        // When
+        underTest.delete(nonExistingAuthorId)
+
+        // Then
+        assertThat(
+            authorRepository.existsById(nonExistingAuthorId)
+        ).isFalse()
+    }
+
+    @Test
+    fun `test that delete author deletes an existing author in the database`() {
+        // Given
+        val existingAuthor = authorRepository.save(testAuthorEntityA())
+        val existingAuthorId = existingAuthor.id!!
+
+        // When
+        underTest.delete(existingAuthorId)
+        val retrievedAuthor = authorRepository.findByIdOrNull(existingAuthorId)
+
+        // Then
+        assertThat(retrievedAuthor).isNull()
+        assertThat(authorRepository.existsById(existingAuthorId)).isFalse()
     }
 }
