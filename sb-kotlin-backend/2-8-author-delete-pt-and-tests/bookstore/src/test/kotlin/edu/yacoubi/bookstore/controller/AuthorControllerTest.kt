@@ -327,4 +327,22 @@ class AuthorControllerTest @Autowired constructor(
             }
         }
     }
+
+    @Test
+    fun `test that delete Author returns HTTP status 204 when author is successfully deleted`() {
+        // Given
+        every { authorService.delete(any()) } answers  {}
+
+        // When
+        val result = mockMvc.delete("$AUTHORS_BASE_URL/{id}", 99) {
+            contentType = MediaType.APPLICATION_JSON
+            accept = MediaType.APPLICATION_JSON
+        }
+
+        // Then
+        result.andExpect {
+            status { isNoContent() }
+        }
+        verify { authorService.delete(eq(99)) }
+    }
 }
