@@ -44,4 +44,8 @@ class AuthorServiceImpl(private val authorRepository: AuthorRepository) : IAutho
 
         return authorRepository.save(updatedAuthor)
     }
+
+    override fun delete(id: Long) {
+        authorRepository.deleteById(id)
+    }
 }

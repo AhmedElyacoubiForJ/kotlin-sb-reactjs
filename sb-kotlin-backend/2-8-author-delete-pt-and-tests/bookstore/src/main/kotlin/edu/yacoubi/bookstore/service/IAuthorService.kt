@@ -9,4 +9,5 @@ interface IAuthorService {
     fun getAuthor(id: Long): AuthorEntity?
     fun fullUpdate(id: Long, authorEntity: AuthorEntity): AuthorEntity
     fun partialUpdate(id: Long, authorUpdateRequest: AuthorUpdateRequest): AuthorEntity
+    fun delete(id: Long)
 }
