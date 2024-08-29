@@ -56,6 +56,35 @@ class BookControllerTest @Autowired constructor(
     }
 
     @Test
+    fun `test that create or full update returns HTTP status 200 when book is successfully updated` () {
+        // Given
+        val isbn = "577-812-123548-911"
+        val author = testAuthorEntityA(id=1)
+        val savedBook = testBookEntityA(isbn, author)
+
+        every {
+            bookService.createOrUpdate(isbn, any())
+        } answers {
+            Pair(savedBook, false)
+        }
+
+        val authorSummaryDto = testAuthorSummaryDtoA(id=1)
+        val bookSummaryDto = testBookSummaryDtoA(isbn, authorSummaryDto)
+
+        // When
+        val result = mockMvc.put("$BOOKS_BASE_URL/{isbn}", isbn) {
+            contentType = APPLICATION_JSON
+            accept = APPLICATION_JSON
+            content = objectMapper.writeValueAsString(bookSummaryDto)
+        }
+
+        // Then
+        result.andExpect {
+            status { isOk() }
+        }
+    }
+
+    @Test
     fun `test that create or full update returns HTTP status 500 when author in the database doesn't have an ID` () {
         // Given
         val isbn = "577-812-123548-911"
