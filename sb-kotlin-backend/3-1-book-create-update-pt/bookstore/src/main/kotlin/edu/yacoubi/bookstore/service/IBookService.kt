@@ -4,5 +4,5 @@ import edu.yacoubi.bookstore.domain.BookSummary
 import edu.yacoubi.bookstore.domain.entities.BookEntity
 
 interface IBookService {
-    fun createOrUpdate(isbn: String, bookEntity: BookSummary): Pair<BookEntity, Boolean>
+    fun createOrUpdate(isbn: String, bookSummary: BookSummary): Pair<BookEntity, Boolean>
 }

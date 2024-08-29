@@ -2,7 +2,6 @@ package edu.yacoubi.bookstore.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
-import edu.yacoubi.bookstore.domain.dto.AuthorUpdateRequestDto
 import edu.yacoubi.bookstore.domain.entities.AuthorEntity
 import edu.yacoubi.bookstore.service.IAuthorService
 import edu.yacoubi.bookstore.testAuthorDtoA
