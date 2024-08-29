@@ -96,4 +96,29 @@ class BookControllerTest @Autowired constructor(
             status { isInternalServerError() }
         }
     }
+
+    @Test
+    fun `test create or update book returns HTTP 400 when author doesn't exist in the database`() {
+        // Given
+        val isbn = "577-812-123548-911"
+
+        every {
+            bookService.createOrUpdate(isbn, any())
+        } throws IllegalStateException()
+
+        val authorSummaryDto = testAuthorSummaryDtoA(id = -1)
+        val bookSummaryDto = testBookSummaryDtoA(isbn, authorSummaryDto)
+
+        // When
+        val result = mockMvc.put("$BOOKS_BASE_URL/{isbn}", isbn) {
+            contentType = APPLICATION_JSON
+            accept = APPLICATION_JSON
+            content = objectMapper.writeValueAsString(bookSummaryDto)
+        }
+
+        // Then
+        result.andExpect {
+            status { isBadRequest() }
+        }
+    }
 }
