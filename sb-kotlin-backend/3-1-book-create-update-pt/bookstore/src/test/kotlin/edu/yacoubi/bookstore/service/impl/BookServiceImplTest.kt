@@ -79,7 +79,8 @@ class BookServiceImplTest @Autowired constructor(
         // Given
         val isbn = "577-812-123548-911"
         val existingAuthor = authorRepository.save(testAuthorEntityA())
-        val bookEntity = bookRepository.save(
+        assertThat(existingAuthor).isNotNull()
+        val existingBook = bookRepository.save(
             BookEntity(
                 isbn = isbn,
                 title = "Original Title",
@@ -88,6 +89,7 @@ class BookServiceImplTest @Autowired constructor(
                 authorEntity = existingAuthor
             )
         )
+        assertThat(existingBook).isNotNull()
         val updatedTitle = "Updated Title"
         val updatedDescription = "Updated Description"
         val updatedImage = "Updated Image"
