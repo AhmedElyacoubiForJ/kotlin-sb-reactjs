@@ -3,6 +3,8 @@ package edu.yacoubi.bookstore.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import edu.yacoubi.bookstore.*
+import edu.yacoubi.bookstore.domain.BookUpdateRequest
+import edu.yacoubi.bookstore.domain.dto.BookUpdateRequestDto
 import edu.yacoubi.bookstore.service.IBookService
 import io.mockk.every
 import org.hamcrest.Matchers.equalTo
@@ -13,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.patch
 import org.springframework.test.web.servlet.put
 import org.springframework.test.web.servlet.result.StatusResultMatchersDsl
 
@@ -260,5 +263,74 @@ class BookControllerTest @Autowired constructor(
                 jsonPath("$.author.image", equalTo("author-a-image.jpeg"))
             }
         }
+    }
+
+    @Test
+    fun `test that book partial update returns a HTTP 400 on IllegalStateException`() {
+        // Given
+        val isbn = "577-812-123548-911"
+        val title = "Title Updated"
+        val bookUpdateRequest = BookUpdateRequest(
+            title = title,
+        )
+
+        val bookUpdateRequestDto = BookUpdateRequestDto(
+            title = title,
+        )
+
+        every {
+            bookService.partialUpdate(isbn, bookUpdateRequest)
+        } throws IllegalStateException()
+
+        // When
+        val result = mockMvc.patch("$BOOKS_BASE_URL/{isbn}", isbn) {
+            contentType = APPLICATION_JSON
+            accept = APPLICATION_JSON
+            content = objectMapper.writeValueAsString(bookUpdateRequestDto)
+        }
+
+        // Then
+        result.andExpect {
+            status { isBadRequest() }
+        }
+    }
+
+    @Test
+    fun `test that book partial update returns the updated book on success`() {
+        // Given
+        val isbn = "577-812-123548-911"
+        val title = "Title Updated"
+        val bookUpdateRequest = BookUpdateRequest(
+            title = title,
+        )
+
+        val bookUpdateRequestDto = BookUpdateRequestDto(
+            title = title,
+        )
+
+        val updatedBook = testBookEntityA(isbn = isbn, testAuthorEntityA(id = 1)).copy(title = title)
+
+        every {
+            bookService.partialUpdate(isbn, bookUpdateRequest)
+        } returns updatedBook
+
+        // When
+        val result = mockMvc.patch("$BOOKS_BASE_URL/{isbn}", isbn) {
+            contentType = APPLICATION_JSON
+            accept = APPLICATION_JSON
+            content = objectMapper.writeValueAsString(bookUpdateRequestDto)
+        }
+
+        // Then
+        result.andExpect {
+            status { isOk() }
+            content {jsonPath("$.isbn", equalTo(isbn))}
+            content {jsonPath("$.title", equalTo(title))}
+            content {jsonPath("$.image", equalTo("book-a-image.jpeg"))}
+            content {jsonPath("$.author.id", equalTo(1))}
+            content {jsonPath("$.author.name", equalTo("John Doe"))}
+            content {jsonPath("$.author.image", equalTo("author-a-image.jpeg"))}
+        }
+
     }
 }
