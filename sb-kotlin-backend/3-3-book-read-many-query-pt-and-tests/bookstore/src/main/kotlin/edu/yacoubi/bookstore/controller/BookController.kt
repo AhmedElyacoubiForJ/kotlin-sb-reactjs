@@ -30,7 +30,7 @@ class BookController(val bookService: IBookService) {
     }
 
     @GetMapping(path = ["/v1/books"])
-    fun getAllBooks(): List<BookSummaryDto> {
-        return bookService.getAllBooks().map { it.toBookSummaryDto() }
+    fun getAllBooks(@RequestParam("author") authorId: Long?): List<BookSummaryDto> {
+        return bookService.getAllBooks(authorId).map { it.toBookSummaryDto() }
     }
 }
