@@ -1,6 +1,7 @@
 package edu.yacoubi.bookstore.service.impl
 
 import edu.yacoubi.bookstore.*
+import edu.yacoubi.bookstore.domain.BookUpdateRequest
 import edu.yacoubi.bookstore.domain.entities.BookEntity
 import edu.yacoubi.bookstore.repository.AuthorRepository
 import edu.yacoubi.bookstore.repository.BookRepository
@@ -225,5 +226,100 @@ class BookServiceImplTest @Autowired constructor(
         // Then
         assertThat(result).isNotNull()
         assertThat(result).isEqualTo(existingBook)
+    }
+
+    @Test
+    fun `test that book partial update throws IllegalStateException when the book doesn't exist in the database`() {
+        // Given
+        val nonExistingIsbn = "577-812-123548-911"
+        val updatedTitle = "Updated Title"
+        val updatedDescription = "Updated Description"
+        val updatedImage = "Updated-Image.jpeg"
+
+        val bookUpdateRequest = BookUpdateRequest(
+            title = updatedTitle,
+            description = updatedDescription,
+            image = updatedImage
+        )
+
+        // When & Then
+        assertThrows<IllegalStateException> {
+            underTest.partialUpdate(isbn = nonExistingIsbn, bookUpdateRequest)
+        }
+    }
+
+    @Test
+    fun `test that book partial update updates the description of an existing book in the database`() {
+        // Given
+        val existingAuthor = authorRepository.save(testAuthorEntityA())
+        assertThat(existingAuthor).isNotNull()
+
+        val existingIsbn = "577-812-123548-911"
+        val existingBook = bookRepository.save(
+            testBookEntityA(isbn = existingIsbn, existingAuthor)
+        )
+        assertThat(existingBook).isNotNull()
+
+        val newDescription = "Updated Description"
+
+        val bookUpdateRequest = BookUpdateRequest(
+            description = newDescription
+        )
+
+        // When
+        val result =underTest.partialUpdate(isbn = existingIsbn, bookUpdateRequest)
+
+        // Then
+        assertThat(result.description).isEqualTo(newDescription)
+    }
+
+    @Test
+    fun `test that book partial update updates the title of an existing book in the database`() {
+        // Given
+        val existingAuthor = authorRepository.save(testAuthorEntityA())
+        assertThat(existingAuthor).isNotNull()
+
+        val existingIsbn = "577-812-123548-911"
+        val existingBook = bookRepository.save(
+            testBookEntityA(isbn = existingIsbn, existingAuthor)
+        )
+        assertThat(existingBook).isNotNull()
+
+        val newTitle = "Updated Title"
+
+        val bookUpdateRequest = BookUpdateRequest(
+            title = newTitle
+        )
+
+        // When
+        val result = underTest.partialUpdate(isbn = existingIsbn, bookUpdateRequest)
+
+        // Then
+        assertThat(result.title).isEqualTo(newTitle)
+    }
+
+    @Test
+    fun `test that book partial update updates the image of an existing book in the database`() {
+        // Given
+        val existingAuthor = authorRepository.save(testAuthorEntityA())
+        assertThat(existingAuthor).isNotNull()
+
+        val existingIsbn = "577-812-123548-911"
+        val existingBook = bookRepository.save(
+            testBookEntityA(isbn = existingIsbn, existingAuthor)
+        )
+        assertThat(existingBook).isNotNull()
+
+        val newImage = "updated-image.jpeg"
+
+        val bookUpdateRequest = BookUpdateRequest(
+            image = newImage
+        )
+
+        // When
+        val result = underTest.partialUpdate(isbn = existingIsbn, bookUpdateRequest)
+
+        // Then
+        assertThat(result.image).isEqualTo(newImage)
     }
 }
