@@ -159,4 +159,57 @@ class BookControllerTest @Autowired constructor(
             }
         }
     }
+
+    @Test
+    fun `test that get all books returns no books when the author ID doesn't exists`(){
+        // Given
+        every {
+            bookService.getAllBooks(any())
+        } answers { emptyList() }
+
+        // When
+        val result = mockMvc.get("$BOOKS_BASE_URL?authorId=-1") {
+            contentType = APPLICATION_JSON
+            accept = APPLICATION_JSON
+        }
+
+        // Then
+        result.andExpect {
+            status { isOk() }
+            content {
+                json("[]")
+            }
+        }
+    }
+
+    @Test
+    fun `test that get all books returns books when the author ID is provided`(){
+        // Given
+        val books = listOf(
+            testBookEntityA(isbn = "577-812-123548-911", testAuthorEntityA(id = 1L))
+        )
+
+        every {
+            bookService.getAllBooks( authorId = 1L)
+        } answers { books }
+
+        // When
+        val result = mockMvc.get("$BOOKS_BASE_URL?author=1") {
+            contentType = APPLICATION_JSON
+            accept = APPLICATION_JSON
+        }
+
+        // Then
+        result.andExpect {
+            status { isOk() }
+            content {
+                jsonPath("$[0].isbn", equalTo("577-812-123548-911"))
+                jsonPath("$[0].title", equalTo("Test Book A"))
+                jsonPath("$[0].image", equalTo("book-a-image.jpeg"))
+                jsonPath("$[0].author.id", equalTo(1))
+                jsonPath("$[0].author.name", equalTo("John Doe"))
+                jsonPath("$[0].author.image", equalTo("author-a-image.jpeg"))
+            }
+        }
+    }
 }
