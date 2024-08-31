@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
 import org.springframework.test.web.servlet.result.StatusResultMatchersDsl
+import org.springframework.web.servlet.function.RequestPredicates.param
 
 private const val BOOKS_BASE_URL = "/v1/books"
 
@@ -164,7 +165,7 @@ class BookControllerTest @Autowired constructor(
     fun `test that get all books returns no books when the author ID doesn't exists`(){
         // Given
         every {
-            bookService.getAllBooks(any())
+            bookService.getAllBooks(authorId = any())
         } answers { emptyList() }
 
         // When

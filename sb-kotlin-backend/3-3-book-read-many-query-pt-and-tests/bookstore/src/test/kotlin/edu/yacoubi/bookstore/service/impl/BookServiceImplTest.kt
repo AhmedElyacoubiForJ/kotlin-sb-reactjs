@@ -11,11 +11,12 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.test.annotation.DirtiesContext
 
 @SpringBootTest
-//@DirtiesContext(
-//    classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD
-//)
+@DirtiesContext(
+    classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD
+)
 @Transactional
 class BookServiceImplTest @Autowired constructor(
     private val underTest: BookServiceImpl,
@@ -148,5 +149,50 @@ class BookServiceImplTest @Autowired constructor(
         // Then
         assertThat(result).hasSize(2)
         assertThat(result).containsExactly(existingBookA, existingBookB)
+    }
+
+    @Test
+    fun `test that get all books returns no authors when the author ID doesn't match`(){
+        // Given
+        val existingAuthorA = authorRepository.save(testAuthorEntityA(1L))
+        assertThat(existingAuthorA).isNotNull()
+        val existingBookA = bookRepository.save(
+            testBookEntityA("577-812-123548-911", existingAuthorA)
+        )
+        assertThat(existingBookA).isNotNull()
+        val nonExistingAuthorId = 3L
+
+        // When
+        val result = underTest.getAllBooks(authorId = nonExistingAuthorId)
+
+        // Then
+        assertThat(result).hasSize(0)
+    }
+
+    @Test
+    fun `test that get all books returns books for the author when the author ID matches`(){
+        // Given
+        val existingAuthorA = authorRepository.save(testAuthorEntityA(1))
+        assertThat(existingAuthorA).isNotNull()
+        val existingBookA = bookRepository.save(
+            testBookEntityA("577-812-123548-911", existingAuthorA)
+        )
+        assertThat(existingBookA).isNotNull()
+        val existingAuthorB = authorRepository.save(testAuthorEntityA(id = 2))
+        assertThat(existingAuthorB).isNotNull()
+        val existingBookB = bookRepository.save(
+            testBookEntityB("577-812-123548-912", existingAuthorB)
+        )
+        assertThat(existingBookB).isNotNull()
+
+        // When
+        val resultA = underTest.getAllBooks(authorId = existingAuthorA.id!!)
+        val resultB = underTest.getAllBooks(authorId = existingAuthorB.id!!)
+
+        // Then
+        assertThat(resultA).hasSize(1)
+        assertThat(resultA[0]).isEqualTo(existingBookA)
+        assertThat(resultB).hasSize(1)
+        assertThat(resultB[0]).isEqualTo(existingBookB)
     }
 }
