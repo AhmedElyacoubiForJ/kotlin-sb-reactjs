@@ -97,15 +97,11 @@ class AuthorControllerTest @Autowired constructor(
 
     @Test
     fun `test that list authors returns an empty list and HTTP status 200 when no authors in the database`() {
-        // every { authorService.list() } returns emptyList()
         every {
             authorService.list()
         } answers {
             emptyList()
         }
-        // equivalent to
-        //// Given
-        //    given(authorService.list()).willReturn(Collections.emptyList());
 
         // When
         mockMvc.get(AUTHORS_BASE_URL) {
@@ -116,16 +112,6 @@ class AuthorControllerTest @Autowired constructor(
             content { json("[]") }
             jsonPath("$.length()").value(0)
         }
-        /*
-        * // When
-            MvcResult result = mockMvc.perform(get("/v1/authors")
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content().json("[]"))
-            .andExpect(jsonPath("$.length()", is(0)))
-            .andReturn();
-        * */
     }
 
     @Test
@@ -142,49 +128,17 @@ class AuthorControllerTest @Autowired constructor(
             status { isOk() }
             content {
                 objectMapper.writeValueAsString(authors)
-//                json(
-//                    """
-//                    [
-//                      {
-//                        "id": 1,
-//                        "name": "John Doe",
-//                        "age": 30,
-//                        "description": "Author A description",
-//                        "image": "author-a-image.jpeg"
-//                      },
-//                      {
-//                        "id": 2,
-//                        "name": "Paul Franklin",
-//                        "age": 35,
-//                        "description": "Author B description",
-//                        "image": "author-b-image.jpeg"
-//                      }
-//                    ]
-//                    """.trimIndent()
-//                )
                 jsonPath("$.length()").value(2)
-
-                jsonPath("$.[0].id").value(1)
-                jsonPath("$.[0].id", equalTo(1)) // or w. hamcrest Matchers
-                jsonPath("$.[0].name").value("John Doe")
-                jsonPath("$.[0].name", equalTo("John Doe")) // or w. hamcrest Matchers
-                jsonPath("$.[0].age").value(30)
-                jsonPath("$.[0].age", equalTo(30)) // or w. hamcrest Matchers
-                jsonPath("$.[0].description").value("Author A description")
-                jsonPath("$.[0].description", equalTo("Author A description"))  //or w. hamcrest Matchers
-                jsonPath("$.[0].image").value("author-a-image.jpeg")
-                jsonPath("$.[0].image", equalTo("author-a-image.jpeg"))  // or w. hamcrest Matchers
-
-                jsonPath("$.[1].id").value(2)
-                jsonPath("$.[1].id", equalTo(2)) // or w. hamcrest Matchers
-                jsonPath("$.[1].name").value("Paul Franklin")
-                jsonPath("$.[1].name", equalTo("Paul Franklin")) // or w. hamcrest Matchers
-                jsonPath("$.[1].age").value(35)
-                jsonPath("$.[1].age", equalTo(35)) // or w. hamcrest Matchers
-                jsonPath("$.[1].description").value("Author B description")
-                jsonPath("$.[1].description", equalTo("Author B description"))  // or w. hamcrest Matchers
-                jsonPath("$.[1].image").value("author-b-image.jpeg")
-                jsonPath("$.[1].image", equalTo("author-b-image.jpeg"))  // or w. hamcrest Matchers
+                jsonPath("$.[0].id", equalTo(1))
+                jsonPath("$.[0].name", equalTo("John Doe"))
+                jsonPath("$.[0].age", equalTo(30))
+                jsonPath("$.[0].description", equalTo("Author A description"))
+                jsonPath("$.[0].image", equalTo("author-a-image.jpeg"))
+                jsonPath("$.[1].id", equalTo(2))
+                jsonPath("$.[1].name", equalTo("Don Joe"))
+                jsonPath("$.[1].age", equalTo(65))
+                jsonPath("$.[1].description", equalTo("Author B description"))
+                jsonPath("$.[1].image", equalTo("author-b-image.jpeg"))
             }
         }
     }

@@ -2,18 +2,17 @@ package edu.yacoubi.bookstore.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
+import edu.yacoubi.bookstore.*
 import edu.yacoubi.bookstore.service.IBookService
-import edu.yacoubi.bookstore.testAuthorEntityA
-import edu.yacoubi.bookstore.testAuthorSummaryDtoA
-import edu.yacoubi.bookstore.testBookEntityA
-import edu.yacoubi.bookstore.testBookSummaryDtoA
 import io.mockk.every
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
 import org.springframework.test.web.servlet.result.StatusResultMatchersDsl
 
@@ -119,6 +118,41 @@ class BookControllerTest @Autowired constructor(
         // Then
         result.andExpect {
             status { isBadRequest() }
+        }
+    }
+
+    @Test
+    fun `test that get all books returns a list of books`() {
+        // Given
+        val books = listOf(
+            testBookEntityA(isbn = "577-812-123548-911", testAuthorEntityA(id = 1)),
+            testBookEntityB(isbn = "577-812-123548-912", testAuthorEntityB(id = 2))
+        )
+
+        every {
+            bookService.getAllBooks()
+        } returns books
+
+        // When
+        val result = mockMvc.get(BOOKS_BASE_URL)
+
+        // Then
+        result.andExpect {
+            status { isOk() }
+            content {
+                jsonPath("$[0].isbn", equalTo("577-812-123548-911"))
+                jsonPath("$[0].title", equalTo("Test Book A"))
+                jsonPath("$[0].image", equalTo("book-a-image.jpeg"))
+                jsonPath("$[0].author.id", equalTo(1))
+                jsonPath("$[0].author.name", equalTo("John Doe"))
+                jsonPath("$[0].author.image", equalTo("author-a-image.jpeg"))
+                jsonPath("$[1].isbn", equalTo("577-812-123548-912"))
+                jsonPath("$[1].title", equalTo("Test Book B"))
+                jsonPath("$[1].image", equalTo("book-b-image.jpeg"))
+                jsonPath("$[1].author.id", equalTo(2))
+                jsonPath("$[1].author.name", equalTo("Don Joe"))
+                jsonPath("$[1].author.image", equalTo("author-b-image.jpeg"))
+            }
         }
     }
 }
