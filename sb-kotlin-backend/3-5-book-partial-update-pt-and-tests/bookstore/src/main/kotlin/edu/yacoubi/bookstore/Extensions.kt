@@ -3,10 +3,8 @@ package edu.yacoubi.bookstore
 import edu.yacoubi.bookstore.domain.AuthorSummary
 import edu.yacoubi.bookstore.domain.AuthorUpdateRequest
 import edu.yacoubi.bookstore.domain.BookSummary
-import edu.yacoubi.bookstore.domain.dto.AuthorDto
-import edu.yacoubi.bookstore.domain.dto.AuthorSummaryDto
-import edu.yacoubi.bookstore.domain.dto.AuthorUpdateRequestDto
-import edu.yacoubi.bookstore.domain.dto.BookSummaryDto
+import edu.yacoubi.bookstore.domain.BookUpdateRequest
+import edu.yacoubi.bookstore.domain.dto.*
 import edu.yacoubi.bookstore.domain.entities.AuthorEntity
 import edu.yacoubi.bookstore.domain.entities.BookEntity
 import edu.yacoubi.bookstore.exception.InvalidAuthorException
@@ -72,4 +70,10 @@ fun BookEntity.toBookSummaryDto() = BookSummaryDto(
     description = this.description,
     image = this.image,
     author = authorEntity.toAuthorSummaryDto()
+)
+
+fun BookUpdateRequestDto.toBookUpdateRequest() = BookUpdateRequest(
+    title = this.title,
+    description = this.description,
+    image = this.image
 )
