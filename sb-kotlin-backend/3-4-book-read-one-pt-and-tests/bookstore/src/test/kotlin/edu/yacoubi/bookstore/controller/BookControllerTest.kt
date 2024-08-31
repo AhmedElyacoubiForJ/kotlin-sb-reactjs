@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
 import org.springframework.test.web.servlet.result.StatusResultMatchersDsl
-import org.springframework.web.servlet.function.RequestPredicates.param
 
 private const val BOOKS_BASE_URL = "/v1/books"
 
@@ -162,7 +161,7 @@ class BookControllerTest @Autowired constructor(
     }
 
     @Test
-    fun `test that get all books returns no books when the author ID doesn't exists`(){
+    fun `test that get all books returns no books when the author ID doesn't exists`() {
         // Given
         every {
             bookService.getAllBooks(authorId = any())
@@ -184,14 +183,14 @@ class BookControllerTest @Autowired constructor(
     }
 
     @Test
-    fun `test that get all books returns books when the author ID is provided`(){
+    fun `test that get all books returns books when the author ID is provided`() {
         // Given
         val books = listOf(
             testBookEntityA(isbn = "577-812-123548-911", testAuthorEntityA(id = 1L))
         )
 
         every {
-            bookService.getAllBooks( authorId = 1L)
+            bookService.getAllBooks(authorId = 1L)
         } answers { books }
 
         // When
@@ -210,6 +209,55 @@ class BookControllerTest @Autowired constructor(
                 jsonPath("$[0].author.id", equalTo(1))
                 jsonPath("$[0].author.name", equalTo("John Doe"))
                 jsonPath("$[0].author.image", equalTo("author-a-image.jpeg"))
+            }
+        }
+    }
+
+    @Test
+    fun `test that get book by ISBN returns HTTP 404 when the book doesn't exist`() {
+        // Given
+        val isbn = "577-812-123548-911"
+        every {
+            bookService.get(any())
+        } answers { null }
+
+        // When
+        val result = mockMvc.get("$BOOKS_BASE_URL/{isbn}", isbn) {
+            contentType = APPLICATION_JSON
+            accept = APPLICATION_JSON
+        }
+
+        // Then
+        result.andExpect {
+            status { isNotFound() }
+        }
+    }
+
+    @Test
+    fun `test that get book by ISBN returns the book when it exists`() {
+        // Given
+        val isbn = "577-812-123548-911"
+        val book = testBookEntityA(isbn = isbn, testAuthorEntityA(id = 1))
+        every {
+            bookService.get(isbn)
+        } answers { book }
+
+        // When
+        val result = mockMvc.get("$BOOKS_BASE_URL/{isbn}", isbn) {
+            contentType = APPLICATION_JSON
+            accept = APPLICATION_JSON
+        }
+
+        // Then
+        result.andExpect {
+            status { isOk() }
+            content {
+                jsonPath("$.isbn", equalTo(isbn))
+                jsonPath("$.title", equalTo("Test Book A"))
+                jsonPath("$.image", equalTo("book-a-image.jpeg"))
+                jsonPath("$.author.id", equalTo(1))
+                jsonPath("$.author.name", equalTo("John Doe"))
+                jsonPath("$.author.image", equalTo("author-a-image.jpeg"))
             }
         }
     }
