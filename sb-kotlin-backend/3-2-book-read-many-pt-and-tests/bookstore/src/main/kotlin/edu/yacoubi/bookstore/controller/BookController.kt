@@ -7,11 +7,7 @@ import edu.yacoubi.bookstore.toBookSummary
 import edu.yacoubi.bookstore.toBookSummaryDto
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class BookController(val bookService: IBookService) {
@@ -33,7 +29,7 @@ class BookController(val bookService: IBookService) {
         }
     }
 
-    @GetMapping(path = ["/books/v1"])
+    @GetMapping(path = ["/v1/books"])
     fun getAllBooks(): List<BookSummaryDto> {
         return bookService.getAllBooks().map { it.toBookSummaryDto() }
     }

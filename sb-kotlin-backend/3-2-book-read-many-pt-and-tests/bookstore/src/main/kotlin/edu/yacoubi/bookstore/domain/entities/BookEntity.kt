@@ -12,7 +12,7 @@ data class BookEntity(
     @Column(name = "title")
     val title: String,
 
-    @Column(name = "description")
+    @Column(name = "description", length = -1)
     val description: String,
 
     @Column(name = "image")
