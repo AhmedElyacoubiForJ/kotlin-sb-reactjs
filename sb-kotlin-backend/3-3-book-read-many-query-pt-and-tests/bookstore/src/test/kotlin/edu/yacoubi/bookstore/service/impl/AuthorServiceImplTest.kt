@@ -32,7 +32,7 @@ class AuthorServiceImplTest @Autowired constructor(
 
         val retrievedAuthor = authorRepository.findByIdOrNull(savedAuthor.id!!)
         assertThat(retrievedAuthor).isNotNull()
-        //assertThat(retrievedAuthor).isEqualTo(testAuthorEntityA(savedAuthor.id))
+        assertThat(retrievedAuthor).isEqualTo(testAuthorEntityA(savedAuthor.id))
         assertThat(retrievedAuthor!!.id).isEqualTo(savedAuthor.id)
         assertThat(retrievedAuthor.name).isEqualTo(savedAuthor.name)
         assertThat(retrievedAuthor.age).isEqualTo(savedAuthor.age)
@@ -259,9 +259,9 @@ class AuthorServiceImplTest @Autowired constructor(
         val retrievedAuthor = authorRepository.findByIdOrNull(existingAuthorId)
 
         // Then
-        //assertThat(result).isEqualTo(expected)
+        assertThat(result).isEqualTo(expected)
         assertThat(retrievedAuthor).isNotNull()
-        //assertThat(retrievedAuthor).isEqualTo(expected)
+        assertThat(retrievedAuthor).isEqualTo(expected)
         assertThat(result.name).isEqualTo(expected.name)
     }
 
