@@ -63,6 +63,12 @@ class BookController(val bookService: IBookService) {
             ResponseEntity(HttpStatus.BAD_REQUEST)
         }
     }
+
+    @DeleteMapping(path = ["/{isbn}"])
+    fun deleteBook(@PathVariable("isbn") isbn: String): ResponseEntity<Unit> {
+        bookService.delete(isbn)
+        return ResponseEntity(HttpStatus.NO_CONTENT)
+    }
 }
 
 
