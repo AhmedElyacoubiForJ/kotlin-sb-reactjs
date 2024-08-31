@@ -7,16 +7,15 @@ import edu.yacoubi.bookstore.domain.BookUpdateRequest
 import edu.yacoubi.bookstore.domain.dto.BookUpdateRequestDto
 import edu.yacoubi.bookstore.service.IBookService
 import io.mockk.every
+import io.mockk.just
+import io.mockk.runs
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.patch
-import org.springframework.test.web.servlet.put
+import org.springframework.test.web.servlet.*
 import org.springframework.test.web.servlet.result.StatusResultMatchersDsl
 
 private const val BOOKS_BASE_URL = "/v1/books"
@@ -331,6 +330,25 @@ class BookControllerTest @Autowired constructor(
             content {jsonPath("$.author.name", equalTo("John Doe"))}
             content {jsonPath("$.author.image", equalTo("author-a-image.jpeg"))}
         }
+    }
 
+    @Test
+    fun `test that delete book deletes a book successfully`() {
+        // Given
+        val isbn = "577-812-123548-911"
+        every {
+            bookService.delete(isbn)
+        } just runs
+
+        // When
+        val result = mockMvc.delete("$BOOKS_BASE_URL/{isbn}", isbn) {
+            contentType = APPLICATION_JSON
+            accept = APPLICATION_JSON
+        }
+
+        // Then
+        result.andExpect {
+            status { isNoContent() }
+        }
     }
 }
