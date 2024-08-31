@@ -1,12 +1,9 @@
 package edu.yacoubi.bookstore.service.impl
 
+import edu.yacoubi.bookstore.*
 import edu.yacoubi.bookstore.domain.entities.BookEntity
 import edu.yacoubi.bookstore.repository.AuthorRepository
 import edu.yacoubi.bookstore.repository.BookRepository
-import edu.yacoubi.bookstore.testAuthorEntityA
-import edu.yacoubi.bookstore.testAuthorSummaryDtoA
-import edu.yacoubi.bookstore.testBookSummaryDtoA
-import edu.yacoubi.bookstore.toBookSummary
 import jakarta.transaction.Transactional
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -117,5 +114,39 @@ class BookServiceImplTest @Autowired constructor(
             )
         )
         assertThat(result.second).isFalse()
+    }
+
+    @Test
+    fun `test get all books returns an empty list when no books in the database`() {
+        // Given
+        // When
+        val result = underTest.getAllBooks()
+
+        // Then
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun `test get all books returns all books from the database`() {
+        // Given
+        val existingAuthorA = authorRepository.save(testAuthorEntityA(1))
+        assertThat(existingAuthorA).isNotNull()
+        val existingBookA = bookRepository.save(
+            testBookEntityA("577-812-123548-911", existingAuthorA)
+        )
+        assertThat(existingBookA).isNotNull()
+        val existingAuthorB = authorRepository.save(testAuthorEntityA(id = 2))
+        assertThat(existingAuthorB).isNotNull()
+        val existingBookB = bookRepository.save(
+            testBookEntityB("577-812-123548-912", existingAuthorB)
+        )
+        assertThat(existingBookB).isNotNull()
+
+        // When
+        val result = underTest.getAllBooks()
+
+        // Then
+        assertThat(result).hasSize(2)
+        assertThat(result).containsExactly(existingBookA, existingBookB)
     }
 }

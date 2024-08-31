@@ -131,10 +131,13 @@ class BookControllerTest @Autowired constructor(
 
         every {
             bookService.getAllBooks()
-        } returns books
+        } answers { books }
 
         // When
-        val result = mockMvc.get(BOOKS_BASE_URL)
+        val result = mockMvc.get(BOOKS_BASE_URL) {
+            contentType = APPLICATION_JSON
+            accept = APPLICATION_JSON
+        }
 
         // Then
         result.andExpect {
@@ -146,6 +149,7 @@ class BookControllerTest @Autowired constructor(
                 jsonPath("$[0].author.id", equalTo(1))
                 jsonPath("$[0].author.name", equalTo("John Doe"))
                 jsonPath("$[0].author.image", equalTo("author-a-image.jpeg"))
+                //
                 jsonPath("$[1].isbn", equalTo("577-812-123548-912"))
                 jsonPath("$[1].title", equalTo("Test Book B"))
                 jsonPath("$[1].image", equalTo("book-b-image.jpeg"))
