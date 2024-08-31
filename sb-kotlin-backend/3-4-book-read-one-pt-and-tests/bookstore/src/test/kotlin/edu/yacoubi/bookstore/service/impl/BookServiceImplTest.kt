@@ -195,4 +195,35 @@ class BookServiceImplTest @Autowired constructor(
         assertThat(resultB).hasSize(1)
         assertThat(resultB[0]).isEqualTo(existingBookB)
     }
+
+    @Test
+    fun `test that get book by isbn returns null when book doesn't exist in the database`(){
+        // Given
+        val nonExistingIsbn = "577-812-123548-913"
+
+        // When
+        val result = underTest.get(isbn = nonExistingIsbn)
+
+        // Then
+        assertThat(result).isNull()
+    }
+
+    @Test
+    fun `test that get book by isbn returns the book when it exists in the database`(){
+        // Given
+        val existingAuthor = authorRepository.save(testAuthorEntityA())
+        assertThat(existingAuthor).isNotNull()
+        val existingIsbn = "577-812-123548-911"
+        val existingBook = bookRepository.save(
+            testBookEntityA(isbn = existingIsbn, existingAuthor)
+        )
+        assertThat(existingBook).isNotNull()
+
+        // When
+        val result = underTest.get(isbn = existingIsbn)
+
+        // Then
+        assertThat(result).isNotNull()
+        assertThat(result).isEqualTo(existingBook)
+    }
 }
